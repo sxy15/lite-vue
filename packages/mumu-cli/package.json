@@ -1,12 +1,28 @@
 {
   "name": "@mumu/cli",
   "version": "0.0.0",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "type": "module",
   "description": "",
-  "main": "index.js",
+  "packageManager": "pnpm@8.8.0",
+  "bin": {
+    "mumu-cli": "./bin.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsc --watch",
+    "build": "rimraf ./lib && tsc",
+    "release": "mumu-cli release",
+    "prepare": "pnpm build"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "typescript": "^5.2.2"
+  }
 }
