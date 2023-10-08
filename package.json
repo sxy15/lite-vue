@@ -8,9 +8,17 @@
   },
   "packageManager": "pnpm@8.8.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "husky install",
+    "test": "echo \"test\" "
+  },
+  "nano-staged": {
+    "*": "npm run test"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "nano-staged": "^0.8.0"
+  }
 }
