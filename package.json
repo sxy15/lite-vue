@@ -1,8 +1,4 @@
 {
-  "name": "mumu",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "engines": {
     "pnpm": ">= 8.8.0"
   },
@@ -20,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@mumu/cli": "workspace:*",
     "@commitlint/cli": "^17.7.2",
     "@commitlint/config-conventional": "^17.7.0",
     "eslint": "^8.51.0",

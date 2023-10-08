@@ -1,6 +1,6 @@
 {
-  "name": "@mumu/cli",
-  "version": "0.0.0",
+  "name": "mumu-eslint-config",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
