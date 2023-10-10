@@ -7,6 +7,6 @@ const pkgJson = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
 
 export const cliVersion: string = pkgJson.version;
 
-logger.greet(`mumu cli v${cliVersion}`);
+logger.greet(`sxyz cli v${cliVersion}`);
 
-process.env.MUMU_CLI_VERSION = cliVersion;
+process.env.sxyz_CLI_VERSION = cliVersion;

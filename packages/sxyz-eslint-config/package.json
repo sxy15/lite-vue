@@ -1,10 +1,10 @@
 {
-  "name": "@mumu/eslint-config",
+  "name": "@sxyz/eslint-config",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "release": "mumu-cli release",
+    "release": "sxyz-cli release",
     "update:deps": "pnpm update --latest --interactive"
   },
   "keywords": [],

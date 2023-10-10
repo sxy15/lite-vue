@@ -16,10 +16,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@mumu/cli": "workspace:*",
-    "@mumu/eslint-config": "workspace:*",
     "@commitlint/cli": "^17.7.2",
     "@commitlint/config-conventional": "^17.7.0",
+    "@sxyz/cli": "workspace:*",
+    "@sxyz/eslint-config": "workspace:*",
+    "@types/node": "^20.8.3",
     "eslint": "^8.51.0",
     "husky": "^8.0.3",
     "nano-staged": "^0.8.0",

@@ -1,6 +1,6 @@
 {
     "root": true,
-    "extends": ["@mumu"],
+    "extends": ["@sxyz"],
     "rules": {
       "prefer-object-spread": "off"
     }

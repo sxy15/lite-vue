@@ -2,4 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # npx --no -- commitlint --edit ${1}
-npx --no-install mumu-cli commit-lint $1
+npx --no-install sxyz-cli commit-lint $1
