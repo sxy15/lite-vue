@@ -15,14 +15,11 @@ importers:
         specifier: ^17.7.0
         version: 17.7.0
       '@sxyz/cli':
-        specifier: workspace:*
+        specifier: ^0.0.1
         version: link:packages/sxyz-cli
       '@sxyz/eslint-config':
         specifier: workspace:*
         version: link:packages/sxyz-eslint-config
-      '@types/node':
-        specifier: ^20.8.3
-        version: 20.8.3
       eslint:
         specifier: ^8.51.0
         version: 8.51.0

@@ -20,6 +20,18 @@ export const ROOT = findRootDir(CWD);
 
 export const SXYZ_CONFIG_FILE = join(ROOT, 'sxyz.config.mjs');
 
+// Config files
+
+export const SCRIPT_EXTS = [
+  '.js',
+  '.jsx',
+  '.vue',
+  '.ts',
+  '.tsx',
+  '.mjs',
+  '.cjs',
+];
+
 async function getSxyzConfigAsync() {
   try {
     return (await import(pathToFileURL(SXYZ_CONFIG_FILE).href)).default;

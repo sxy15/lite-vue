@@ -16,6 +16,14 @@ program
   });
 
 program
+  .command('lint')
+  .description('Run lint')
+  .action(async () => {
+    const { lint } = await import('./commands/lint.js');
+    return lint();
+  });
+
+program
   .command('commit-lint <gitParams>')
   .description('lint commit message')
   .action(async (gitParams) => {
