@@ -1,10 +1,10 @@
 import fs from 'fs-extra';
 import glob from 'fast-glob';
-import chalk from 'chalk';
+import color from 'picocolors';
 import { logger } from 'rslog';
 import { prompt } from 'enquirer';
 import { sep, join } from 'node:path';
-import { CWD, GENERATOR_DIR } from './constant';
+import { CWD, GENERATOR_DIR } from './constant.js';
 
 const PROMPTS = [
   {
@@ -59,7 +59,7 @@ export class Generator {
   }
 
   writing() {
-    logger.info(`Creating project in ${chalk.green(this.outputDir)}\n`);
+    logger.info(`Creating project in ${color.green(this.outputDir)}\n`);
 
     const templatePath = join(GENERATOR_DIR, this.inputs.vueVersion).replace(
       /\\/g,
@@ -90,15 +90,15 @@ export class Generator {
     fs.writeFileSync(to, content);
 
     const name = to.replace(this.outputDir + sep, '');
-    logger.success(`Generated ${chalk.green(name)}`);
+    logger.success(`Generated ${color.green(name)}`);
   }
 
   end() {
     const { name } = this.inputs;
 
-    logger.success(`Successfully created ${chalk.yellow(name)}.`);
+    logger.success(`Successfully created ${color.yellow(name)}.`);
     logger.success(
-      `Run ${chalk.yellow(
+      `Run ${color.yellow(
         `cd ${name} && git init && pnpm i && pnpm run dev`,
       )} to start development!`,
     );
