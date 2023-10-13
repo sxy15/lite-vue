@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "allowJs": true,
+    "noImplicitThis": true,
+  },
+  "include": ["src/**/*", "docs/**/*", "test/**/*"],
+  "exclude": ["**/node_modules", "**/.*/"]
+}
