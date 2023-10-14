@@ -1,6 +1,6 @@
 import { join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 function findRootDir(dir: string): string {
   if (existsSync(join(dir, 'sxyz.config.mjs'))) {
@@ -17,6 +17,7 @@ function findRootDir(dir: string): string {
 // Root paths
 export const CWD = process.cwd();
 export const ROOT = findRootDir(CWD);
+export const PACKAGE_JSON_FILE = join(ROOT, 'package.json');
 
 export const SXYZ_CONFIG_FILE = join(ROOT, 'sxyz.config.mjs');
 
@@ -39,6 +40,11 @@ export const SCRIPT_EXTS = [
   '.mjs',
   '.cjs',
 ];
+
+export function getPackageJson() {
+  const rawJson = readFileSync(PACKAGE_JSON_FILE, 'utf-8');
+  return JSON.parse(rawJson);
+}
 
 async function getSxyzConfigAsync() {
   try {

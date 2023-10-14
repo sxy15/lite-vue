@@ -9,6 +9,10 @@ export type NodeEnv = 'production' | 'development' | 'test';
 
 export const ENTRY_EXTS = ['js', 'ts', 'tsx', 'jsx', 'vue'];
 
+export function normalizePath(path: string): string {
+  return path.replace(/\\/g, '/');
+}
+
 export function hasDefaultExport(code: string) {
   return code.includes('export default') || code.includes('export { default }');
 }
@@ -49,4 +53,18 @@ export function smartOutputFile(filePath: string, content: string) {
   }
 
   outputFileSync(filePath, content);
+}
+
+const camelizeRE = /-(\w)/g;
+const pascalizeRE = /(\w)(\w*)/g;
+
+export function camelize(str: string): string {
+  return str.replace(camelizeRE, (_, c) => c.toUpperCase());
+}
+
+export function pascalize(str: string): string {
+  return camelize(str).replace(
+    pascalizeRE,
+    (_, c1, c2) => c1.toUpperCase() + c2,
+  );
 }
