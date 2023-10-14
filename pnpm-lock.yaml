@@ -64,7 +64,11 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
 
-  packages/sxyz: {}
+  packages/sxyz:
+    devDependencies:
+      vue:
+        specifier: ^3.3.4
+        version: 3.3.4
 
   packages/sxyz-cli:
     dependencies:

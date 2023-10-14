@@ -6,6 +6,7 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "eslint ./packages/**/src ./packages/**/test --ext .js,.ts,.tsx,.vue,.mjs,.cjs",
+    "dev": "pnpm --dir ./packages/sxyz dev",
     "test": "echo \"test\" "
   },
   "nano-staged": {

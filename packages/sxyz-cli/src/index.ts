@@ -9,4 +9,4 @@ export const cliVersion: string = pkgJson.version;
 
 logger.greet(`sxyz cli v${cliVersion}`);
 
-process.env.sxyz_CLI_VERSION = cliVersion;
+process.env.SXYZ_CLI_VERSION = cliVersion;

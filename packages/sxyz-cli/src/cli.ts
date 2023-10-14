@@ -6,6 +6,14 @@ const program = new Command();
 program.version(`@sxyz/cli ${cliVersion}`);
 
 program
+  .command('dev')
+  .description('Run dev server')
+  .action(async () => {
+    const { dev } = await import('./commands/dev.js');
+    return dev();
+  });
+
+program
   .command('release')
   .description('Compile components and release it')
   .option('--tag <tag>', 'Release tag')
