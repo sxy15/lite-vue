@@ -19,5 +19,10 @@ export function genSiteEntry(): Promise<void> {
 
 export async function compileSite(production = false) {
   await genSiteEntry();
-  console.log(production);
+  console.log('compileSite', production);
+  // if(production) {
+
+  // } else {
+
+  // }
 }

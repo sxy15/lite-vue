@@ -6,6 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const { readdirSync, outputFileSync } = fse;
 
 export type NodeEnv = 'production' | 'development' | 'test';
+export type BuildTarget = 'site' | 'package';
 
 export const ENTRY_EXTS = ['js', 'ts', 'tsx', 'jsx', 'vue'];
 
@@ -19,6 +20,10 @@ export function hasDefaultExport(code: string) {
 
 export function setNodeEnv(value: NodeEnv) {
   process.env.NODE_ENV = value;
+}
+
+export function setBuildTarget(value: BuildTarget) {
+  process.env.BUILD_TARGET = value;
 }
 
 export function getComponents() {
