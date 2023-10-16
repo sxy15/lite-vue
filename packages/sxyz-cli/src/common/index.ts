@@ -1,7 +1,8 @@
 import fse from 'fs-extra';
-import { SRC_DIR } from './constant.js';
+import { SRC_DIR, getSxyzConfig } from './constant.js';
 import { join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
+import { InlineConfig, loadConfigFromFile, mergeConfig } from 'vite';
 
 const { readdirSync, outputFileSync } = fse;
 
@@ -72,4 +73,44 @@ export function pascalize(str: string): string {
     pascalizeRE,
     (_, c1, c2) => c1.toUpperCase() + c2,
   );
+}
+
+export async function mergeCustomViteConfig(
+  config: InlineConfig,
+  mode: 'production' | 'development',
+): Promise<InlineConfig> {
+  const sxyzConfig = getSxyzConfig();
+  const configureVite = sxyzConfig.build?.configureVite;
+
+  const userConfig = await loadConfigFromFile(
+    {
+      mode,
+      command: mode === 'production' ? 'build' : 'serve',
+    },
+    undefined,
+    process.cwd(),
+  );
+
+  if (configureVite) {
+    const ret = configureVite(config);
+    if (ret) {
+      config = ret;
+    }
+  }
+
+  if (userConfig) {
+    return mergeConfig(config, userConfig.config);
+  }
+  return config;
+}
+
+export function removeExt(path: string) {
+  return path.replace('.js', '');
+}
+
+export function decamelize(str: string, sep = '-') {
+  return str
+    .replace(/([a-z\d])([A-Z])/g, '$1' + sep + '$2')
+    .replace(/([A-Z])([A-Z][a-z\d]+)/g, '$1' + sep + '$2')
+    .toLowerCase();
 }

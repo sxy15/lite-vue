@@ -17,14 +17,15 @@ function findRootDir(dir: string): string {
 // Root paths
 export const CWD = process.cwd();
 export const ROOT = findRootDir(CWD);
+export const DOCS_DIR = join(ROOT, 'docs');
 export const PACKAGE_JSON_FILE = join(ROOT, 'package.json');
-
 export const SXYZ_CONFIG_FILE = join(ROOT, 'sxyz.config.mjs');
 
 // Relative paths
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const DIST_DIR = join(__dirname, '..', '..', 'dist');
 export const SITE_SRC_DIR = join(__dirname, '..', '..', 'site');
+export const SITE_DIST_DIR = join(ROOT, 'site-dist');
 
 // Dist files
 export const STYLE_DEPS_JSON_FILE = join(DIST_DIR, 'style-deps.json');
@@ -77,3 +78,4 @@ function getSrcDir() {
 }
 
 export const SRC_DIR = getSrcDir();
+export const STYLE_DIR = join(SRC_DIR, 'style');

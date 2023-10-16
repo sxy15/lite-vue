@@ -1,4 +1,7 @@
+import { build } from 'vite';
 import { PACKAGE_ENTRY_FILE } from '../common/constant.js';
+import { mergeCustomViteConfig } from '../common/index.js';
+import { getViteConfigForSiteProd } from '../config/vite.site.js';
 import { genPackageEntry } from './gen-package-entry.js';
 import { genStyleDepsMap } from './gen-style-deps-map.js';
 
@@ -17,12 +20,15 @@ export function genSiteEntry(): Promise<void> {
   });
 }
 
-export async function compileSite(production = false) {
+export async function compileSite(production = true) {
   await genSiteEntry();
-  console.log('compileSite', production);
-  // if(production) {
-
-  // } else {
-
-  // }
+  if (production) {
+    const config = await mergeCustomViteConfig(
+      getViteConfigForSiteProd(),
+      'production',
+    );
+    await build(config);
+  } else {
+    console.log('dev');
+  }
 }

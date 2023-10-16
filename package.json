@@ -7,6 +7,8 @@
     "prepare": "husky install",
     "lint": "eslint ./packages/**/src ./packages/**/test --ext .js,.ts,.tsx,.vue,.mjs,.cjs",
     "dev": "pnpm --dir ./packages/sxyz dev",
+    "build": "pnpm --dir ./packages/sxyz build",
+    "build:site": "pnpm --dir ./packages/sxyz build:site",
     "test": "echo \"test\" "
   },
   "nano-staged": {
