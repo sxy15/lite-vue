@@ -30,6 +30,7 @@ module.exports = {
     'vue/require-v-for-key': 'off',
     'vue/require-default-prop': 'off',
     'vue/no-unused-components': 'off',
+    'vue/no-v-text-v-html-on-component': 'off',
     'vue/multi-word-component-names': 'off',
     'vue/no-setup-props-destructure': 'off',
     'vue/return-in-computed-property': 'off',

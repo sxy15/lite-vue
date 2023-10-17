@@ -1,9 +1,14 @@
-import { build } from 'vite';
+import { build, createServer } from 'vite';
 import { PACKAGE_ENTRY_FILE } from '../common/constant.js';
 import { mergeCustomViteConfig } from '../common/index.js';
-import { getViteConfigForSiteProd } from '../config/vite.site.js';
+import {
+  getViteConfigForSiteDev,
+  getViteConfigForSiteProd,
+} from '../config/vite.site.js';
 import { genPackageEntry } from './gen-package-entry.js';
 import { genStyleDepsMap } from './gen-style-deps-map.js';
+import { createRequire } from 'node:module';
+import color from 'picocolors';
 
 export function genSiteEntry(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -20,7 +25,7 @@ export function genSiteEntry(): Promise<void> {
   });
 }
 
-export async function compileSite(production = true) {
+export async function compileSite(production = false) {
   await genSiteEntry();
   if (production) {
     const config = await mergeCustomViteConfig(
@@ -29,6 +34,16 @@ export async function compileSite(production = true) {
     );
     await build(config);
   } else {
-    console.log('dev');
+    const config = await mergeCustomViteConfig(
+      getViteConfigForSiteDev(),
+      'development',
+    );
+    const server = await createServer(config);
+    await server.listen(config.server?.port);
+    const require = createRequire(import.meta.url);
+    const { version } = require('vite/package.json');
+    const viteInfo = color.cyan(`vite v${version}`);
+    console.log(`  ${viteInfo}` + color.green(` dev server running at:\n`));
+    server.printUrls();
   }
 }

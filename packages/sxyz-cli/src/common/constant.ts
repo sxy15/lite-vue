@@ -17,12 +17,15 @@ function findRootDir(dir: string): string {
 // Root paths
 export const CWD = process.cwd();
 export const ROOT = findRootDir(CWD);
+export const ES_DIR = join(ROOT, 'es');
+export const LIB_DIR = join(ROOT, 'lib');
 export const DOCS_DIR = join(ROOT, 'docs');
 export const PACKAGE_JSON_FILE = join(ROOT, 'package.json');
 export const SXYZ_CONFIG_FILE = join(ROOT, 'sxyz.config.mjs');
 
 // Relative paths
 const __dirname = dirname(fileURLToPath(import.meta.url));
+export const CJS_DIR = join(__dirname, '..', '..', 'cjs');
 export const DIST_DIR = join(__dirname, '..', '..', 'dist');
 export const SITE_SRC_DIR = join(__dirname, '..', '..', 'site');
 export const SITE_DIST_DIR = join(ROOT, 'site-dist');
@@ -32,6 +35,7 @@ export const STYLE_DEPS_JSON_FILE = join(DIST_DIR, 'style-deps.json');
 export const PACKAGE_ENTRY_FILE = join(DIST_DIR, 'package-entry.js');
 
 // Config files
+export const POSTCSS_CONFIG_FILE = join(CJS_DIR, 'postcss.config.cjs');
 
 export const SCRIPT_EXTS = [
   '.js',
@@ -42,7 +46,7 @@ export const SCRIPT_EXTS = [
   '.mjs',
   '.cjs',
 ];
-
+export const STYLE_EXTS = ['.css', '.less', '.scss'];
 export function getPackageJson() {
   const rawJson = readFileSync(PACKAGE_JSON_FILE, 'utf-8');
   return JSON.parse(rawJson);

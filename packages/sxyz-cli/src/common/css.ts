@@ -32,3 +32,12 @@ export function getCssBaseFile() {
 
   return null;
 }
+
+const IMPORT_STYLE_RE = /import\s+?(?:(?:".*?")|(?:'.*?'))[\s]*?(?:;|$|)/g;
+
+// "import 'a.less';" => "import 'a.css';"
+export function replaceCSSImportExt(code: string) {
+  return code.replace(IMPORT_STYLE_RE, (str) =>
+    str.replace(`.${CSS_LANG}`, '.css'),
+  );
+}
