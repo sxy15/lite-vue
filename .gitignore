@@ -6,17 +6,3 @@
 
 # npm
 node_modules
-package-lock.json
-
-# test
-**/test/coverage
-
-# dist file
-es
-lib
-dist
-**/site-dist
-changelog.generated.md
-
-# temp file
-packages/sxyz/README.md

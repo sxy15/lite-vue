@@ -1,8 +1,0 @@
-{
-    "root": true,
-    "extends": ["@sxyz"],
-    "rules": {
-      "prefer-object-spread": "off"
-    }
-  }
-  
