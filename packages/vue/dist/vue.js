@@ -1,6 +1,14 @@
 var Vue = (function (exports) {
     'use strict';
 
+    var isArray = Array.isArray;
+    var isObject = function (value) {
+        return value !== null && typeof value === 'object';
+    };
+    var hasChanged = function (value, oldValue) {
+        return !Object.is(value, oldValue);
+    };
+
     /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
@@ -59,8 +67,6 @@ var Vue = (function (exports) {
         var e = new Error(message);
         return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
     };
-
-    var isArray = Array.isArray;
 
     var createDep = function (effects) {
         var dep = new Set(effects);
@@ -165,9 +171,61 @@ var Vue = (function (exports) {
         proxyMap.set(target, proxy);
         return proxy;
     }
+    var toReactive = function (value) {
+        return isObject(value) ? reactive(value) : value;
+    };
+
+    function isRef(r) {
+        return r ? r.__v_isRef === true : false;
+    }
+    function ref(val) {
+        return createRef(val, false);
+    }
+    function createRef(rawValue, shallow) {
+        if (isRef(rawValue)) {
+            return rawValue;
+        }
+        return new RefImpl(rawValue, shallow);
+    }
+    var RefImpl = /** @class */ (function () {
+        function RefImpl(value, __v__isShallow) {
+            this.__v__isShallow = __v__isShallow;
+            this.dep = undefined;
+            this.__v_isRef = true;
+            this._rawValue = value;
+            this._value = __v__isShallow ? value : toReactive(value);
+        }
+        Object.defineProperty(RefImpl.prototype, "value", {
+            get: function () {
+                trackRefValue(this);
+                return this._value;
+            },
+            set: function (newVal) {
+                if (hasChanged(newVal, this._rawValue)) {
+                    this._rawValue = newVal;
+                    this._value = toReactive(newVal);
+                    triggerRefValue(this);
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        return RefImpl;
+    }());
+    function trackRefValue(ref) {
+        if (activeEffect) {
+            trackEffects(ref.dep || (ref.dep = createDep()));
+        }
+    }
+    function triggerRefValue(ref) {
+        if (ref.dep) {
+            triggerEffects(ref.dep);
+        }
+    }
 
     exports.effect = effect;
     exports.reactive = reactive;
+    exports.ref = ref;
 
     return exports;
 

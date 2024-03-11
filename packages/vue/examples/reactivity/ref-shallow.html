@@ -13,12 +13,17 @@
   <div id="app2"></div>
 
   <script>
-    const { reactive, effect } = Vue
+    const { reactive, effect, ref } = Vue
 
-    const obj = reactive('li si')
+    const obj = ref('张三')
 
-    console.log(obj)
-
+    effect(() => {
+      document.querySelector('#app').innerText = obj.value
+    })
+    
+    setTimeout(() => {
+      obj.value = 'li si'
+    }, 2000)
   </script>
 
 </body>
