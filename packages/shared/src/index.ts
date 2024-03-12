@@ -1,3 +1,6 @@
+export { ShapeFlags } from './shapeFlags'
+export { normalizeClass } from './normalizeProp'
+
 export const isArray = Array.isArray;
 
 export const isObject = (value: unknown) => {
@@ -10,6 +13,10 @@ export const hasChanged = (value: any, oldValue: any): boolean => {
 
 export const isFunction = (value: unknown): value is Function => {
   return typeof value === 'function';
+}
+
+export const isString = (value: unknown): value is string => {
+  return typeof value === 'string';
 }
 
 export const extend = Object.assign;

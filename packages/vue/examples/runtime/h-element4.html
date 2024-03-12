@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script src="../../dist/vue.js"></script>
+
+  <div id="app"></div>
+
+  <script>
+    const { h, Text, Comment, Fragment } = Vue
+
+    const vnodeText = h(Text, 'hello world')
+
+    console.log(vnodeText)
+
+    const vnodeComment = h(Comment, 'hello world')
+
+    console.log(vnodeComment)
+
+    const vnodeFragment = h(Fragment, 'hello world')
+
+    console.log(vnodeFragment)
+  </script>
+</body>
+</html>
