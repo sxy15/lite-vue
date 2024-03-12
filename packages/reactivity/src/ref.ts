@@ -1,6 +1,6 @@
 import { hasChanged } from "@vue/shared"
 import { Dep, createDep } from "./dep"
-import { activeEffect, trackEffects, trigger, triggerEffects } from "./effect"
+import { activeEffect, trackEffects, triggerEffects } from "./effect"
 import { toReactive } from "./reactive"
 
 export interface Ref<T = any> {
