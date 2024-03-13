@@ -7,6 +7,7 @@ export const Comment = Symbol('Comment')
 
 export interface VNode {
   __v_isVNode: true;
+  key?: any;
   type: any;
   props: any;
   children: any;
@@ -69,4 +70,8 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
 
   vnode.children = children
   vnode.shapeFlag |= type
+}
+
+export function isSameVNodeType(n1: VNode, n2: VNode) {
+  return n1.type === n2.type && n1.key === n2.key
 }

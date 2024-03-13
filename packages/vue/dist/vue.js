@@ -39,6 +39,8 @@ var Vue = (function (exports) {
     };
     var extend = Object.assign;
     var EMPTY_OBJ = {};
+    var onRE = /^on[^a-z]/;
+    var isOn = function (key) { return onRE.test(key); };
 
     /******************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -413,7 +415,7 @@ var Vue = (function (exports) {
     }
 
     var Fragment = Symbol('Fragment');
-    var Text = Symbol('Text');
+    var Text$1 = Symbol('Text');
     var Comment = Symbol('Comment');
     function isVNode(v) {
         return v ? v.__v_isVNode === true : false;
@@ -461,6 +463,9 @@ var Vue = (function (exports) {
         vnode.children = children;
         vnode.shapeFlag |= type;
     }
+    function isSameVNodeType(n1, n2) {
+        return n1.type === n2.type && n1.key === n2.key;
+    }
 
     function h(type, propsOrChildren, children) {
         var l = arguments.length;
@@ -487,15 +492,339 @@ var Vue = (function (exports) {
         }
     }
 
+    function normalizeVNode(child) {
+        if (typeof child === 'object') {
+            return cloneIfMounted(child);
+        }
+        else {
+            return createVNode(Text, null, String(child));
+        }
+    }
+    /**
+     * clone VNode
+     */
+    function cloneIfMounted(child) {
+        return child;
+    }
+
+    function createRenderer(options) {
+        return baseCreateRenderer(options);
+    }
+    function baseCreateRenderer(options) {
+        var hostInsert = options.insert, hostPatchProp = options.patchProp, hostSetElementText = options.setElementText, hostCreateElement = options.createElement, hostRemove = options.remove, hostCreateText = options.createText, hostSetText = options.setText, hostCreateComment = options.createComment;
+        var processFragment = function (oldVNode, newVNode, container, anchor) {
+            if (oldVNode == null) {
+                mountChildren(newVNode.children, container, anchor);
+            }
+            else {
+                patchChildren(oldVNode, newVNode, container);
+            }
+        };
+        var processCommentNode = function (oldVNode, newVNode, container, anchor) {
+            if (oldVNode == null) {
+                newVNode.el = hostCreateComment(newVNode.children);
+                hostInsert(newVNode.el, container, anchor);
+            }
+            else {
+                newVNode.el = oldVNode.el;
+            }
+        };
+        var processText = function (oldVNode, newVNode, container, anchor) {
+            if (oldVNode == null) {
+                newVNode.el = hostCreateText(newVNode.children);
+                hostInsert(newVNode.el, container, anchor);
+            }
+            else {
+                var el = (newVNode.el = oldVNode.el);
+                if (newVNode.children !== oldVNode.children) {
+                    hostSetText(el, newVNode.children);
+                }
+            }
+        };
+        var processElement = function (oldVNode, newVNode, container, anchor) {
+            if (oldVNode == null) {
+                // 直接挂载
+                mountElement(newVNode, container, anchor);
+            }
+            else {
+                // 更新
+                patchElement(oldVNode, newVNode);
+            }
+        };
+        var mountElement = function (vnode, container, anchor) {
+            var type = vnode.type, props = vnode.props, shapeFlag = vnode.shapeFlag;
+            var el = (vnode.el = hostCreateElement(type));
+            if (shapeFlag & 8 /* ShapeFlags.TEXT_CHILDREN */) {
+                hostSetElementText(el, vnode.children);
+            }
+            if (props) {
+                for (var key in props) {
+                    hostPatchProp(el, key, null, props[key]);
+                }
+            }
+            hostInsert(el, container, anchor);
+        };
+        var patchElement = function (oldVNode, newVNode) {
+            var el = (newVNode.el = oldVNode.el);
+            var oldProps = oldVNode.props || EMPTY_OBJ;
+            var newProps = newVNode.props || EMPTY_OBJ;
+            patchChildren(oldVNode, newVNode, el);
+            patchProps(el, newVNode, oldProps, newProps);
+        };
+        var mountChildren = function (children, container, anchor) {
+            // 处理 Cannot assign to read only property '0' of string 'xxx'
+            if (isString(children)) {
+                children = children.split('');
+            }
+            for (var i = 0; i < children.length; i++) {
+                var child = (children[i] = normalizeVNode(children[i]));
+                console.log(child);
+                patch(null, child, container, anchor);
+            }
+        };
+        var patchChildren = function (oldVNode, newVNode, container, anchor) {
+            var c1 = oldVNode && oldVNode.children;
+            var prevShapeFlag = oldVNode ? oldVNode.shapeFlag : 0;
+            var c2 = newVNode && newVNode.children;
+            var shapeFlag = newVNode.shapeFlag;
+            if (shapeFlag & 8 /* ShapeFlags.TEXT_CHILDREN */) {
+                if (c2 !== c1) {
+                    // 挂载新子节点的文本
+                    hostSetElementText(container, c2);
+                }
+            }
+            else {
+                if (prevShapeFlag & 16 /* ShapeFlags.ARRAY_CHILDREN */) ;
+                else {
+                    if (prevShapeFlag & 8 /* ShapeFlags.TEXT_CHILDREN */) {
+                        // 移除旧的 children
+                        hostSetElementText(container, '');
+                    }
+                }
+            }
+        };
+        var patchProps = function (el, key, oldProps, newProps) {
+            if (oldProps !== newProps) {
+                for (var key_1 in newProps) {
+                    var prev = oldProps[key_1];
+                    var next = newProps[key_1];
+                    if (prev !== next) {
+                        hostPatchProp(el, key_1, prev, next);
+                    }
+                }
+                // 移除旧的 & 不在新的 props 中的 props
+                if (oldProps !== EMPTY_OBJ) {
+                    for (var key_2 in oldProps) {
+                        if (!(key_2 in newProps)) {
+                            hostPatchProp(el, key_2, oldProps[key_2], null);
+                        }
+                    }
+                }
+            }
+        };
+        var patch = function (oldVNode, newVNode, container, anchor) {
+            if (anchor === void 0) { anchor = null; }
+            if (oldVNode === newVNode) {
+                return;
+            }
+            if (oldVNode && !isSameVNodeType(oldVNode, newVNode)) {
+                unmount(oldVNode);
+                oldVNode = null;
+            }
+            var type = newVNode.type, shapeFlag = newVNode.shapeFlag;
+            switch (type) {
+                case Text$1:
+                    processText(oldVNode, newVNode, container, anchor);
+                    break;
+                case Comment:
+                    processCommentNode(oldVNode, newVNode, container, anchor);
+                    break;
+                case Fragment:
+                    processFragment(oldVNode, newVNode, container, anchor);
+                    break;
+                default:
+                    if (shapeFlag & 1 /* ShapeFlags.ELEMENT */) {
+                        processElement(oldVNode, newVNode, container, anchor);
+                    }
+            }
+        };
+        var unmount = function (vnode) {
+            hostRemove(vnode.el);
+        };
+        var render = function (vnode, container) {
+            if (vnode === null) {
+                // unmount
+                if (container._vnode) {
+                    unmount(container._vnode);
+                }
+            }
+            else {
+                patch(container._vnode || null, vnode, container);
+            }
+            container._vnode = vnode; // 把 vnode 保存为老的 vnode
+        };
+        return {
+            render: render
+        };
+    }
+
+    var doc = document;
+    var nodeOps = {
+        insert: function (child, parent, anchor) {
+            parent.insertBefore(child, anchor || null);
+        },
+        createElement: function (tag) {
+            var el = doc.createElement(tag);
+            return el;
+        },
+        setElementText: function (el, text) {
+            el.textContent = text;
+        },
+        remove: function (child) {
+            var parent = child.parentNode;
+            if (parent) {
+                parent.removeChild(child);
+            }
+        },
+        createText: function (text) {
+            return doc.createTextNode(text);
+        },
+        setText: function (node, text) {
+            node.nodeValue = text;
+        },
+        createComment: function (text) {
+            return doc.createComment(text);
+        }
+    };
+
+    function patchClass(el, value) {
+        if (value === null) {
+            el.removeAttribute('class');
+        }
+        else {
+            el.className = value;
+        }
+    }
+
+    function patchDomProp(el, key, value) {
+        try {
+            el[key] = value;
+        }
+        catch (e) { }
+    }
+
+    function patchAttr(el, key, value) {
+        if (value == null) {
+            el.removeAttribute(key);
+        }
+        else {
+            el.setAttribute(key, value);
+        }
+    }
+
+    function patchStyle(el, prev, next) {
+        var style = el.style;
+        var isCssString = isString(next);
+        if (next && !isCssString) {
+            for (var key in next) {
+                setStyle(style, key, next[key]);
+            }
+            if (prev && !isString(prev)) {
+                for (var key in prev) {
+                    if (next[key] == null) {
+                        setStyle(style, key, '');
+                    }
+                }
+            }
+        }
+    }
+    function setStyle(style, name, value) {
+        style[name] = value;
+    }
+
+    function patchEvent(el, rawName, prevValue, nextValue) {
+        var invokers = el._vei || (el._vei = {});
+        var existingInvoker = invokers[rawName];
+        if (nextValue && existingInvoker) {
+            existingInvoker.value = nextValue;
+        }
+        else {
+            var name_1 = parseName(rawName);
+            if (nextValue) {
+                var invoker = invokers[rawName] = createInvoker(nextValue);
+                el.addEventListener(name_1, invoker);
+            }
+            else if (existingInvoker) {
+                el.removeEventListener(name_1, existingInvoker);
+                invokers[rawName] = undefined;
+            }
+        }
+    }
+    function parseName(name) {
+        return name.slice(2).toLowerCase();
+    }
+    function createInvoker(initialValue) {
+        var invoker = function (e) {
+            invoker.value && invoker.value(e);
+        };
+        invoker.value = initialValue;
+        return invoker;
+    }
+
+    var patchProp = function (el, key, prevValue, nextValue) {
+        if (key === 'class') {
+            patchClass(el, nextValue);
+        }
+        else if (key === 'style') {
+            patchStyle(el, prevValue, nextValue);
+        }
+        else if (isOn(key)) {
+            patchEvent(el, key, prevValue, nextValue);
+        }
+        else if (shouldSetAsProp(el, key)) {
+            patchDomProp(el, key, nextValue);
+        }
+        else {
+            patchAttr(el, key, nextValue);
+        }
+    };
+    function shouldSetAsProp(el, key) {
+        if (key === 'form') {
+            return false;
+        }
+        if (key === 'list' && el.tagName === 'INPUT') {
+            return false;
+        }
+        if (key === 'type' && el.tagName === 'TEXTAREA') {
+            return false;
+        }
+        return key in el;
+    }
+
+    var renderer;
+    var rendererOptions = extend({ patchProp: patchProp }, nodeOps);
+    function ensureRenderer() {
+        return renderer || (renderer = createRenderer(rendererOptions));
+    }
+    var render = function () {
+        var _a;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = ensureRenderer()).render.apply(_a, __spreadArray([], __read(args), false));
+    };
+
     exports.Comment = Comment;
     exports.Fragment = Fragment;
-    exports.Text = Text;
+    exports.Text = Text$1;
     exports.computed = computed;
     exports.effect = effect;
     exports.h = h;
     exports.queuePreFlushCb = queuePreFlushCb;
     exports.reactive = reactive;
     exports.ref = ref;
+    exports.render = render;
     exports.watch = watch;
 
     return exports;

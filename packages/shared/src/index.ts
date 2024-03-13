@@ -22,3 +22,6 @@ export const isString = (value: unknown): value is string => {
 export const extend = Object.assign;
 
 export const EMPTY_OBJ: {readonly [key: string] : any} = {};
+
+const onRE = /^on[^a-z]/;
+export const isOn = (key: string) => onRE.test(key);
