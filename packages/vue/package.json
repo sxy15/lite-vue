@@ -1,0 +1,23 @@
+{
+  "name": "vue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/vue.cjs.js",
+  "module": "dist/vue.esm.js",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "buildOptions": {
+    "name": "Vue",
+    "formats": [
+      "esm-bundler",
+      "esm-browser",
+      "cjs",
+      "global"
+    ]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

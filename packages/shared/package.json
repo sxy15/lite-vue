@@ -1,0 +1,23 @@
+{
+  "name": "@vue/shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/shared.cjs.js",
+  "module": "dist/shared.esm.js",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "buildOptions": {
+    "name": "VueShared",
+    "formats": [
+      "esm-bundler",
+      "esm-browser",
+      "cjs",
+      "global"
+    ]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
