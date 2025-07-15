@@ -14,6 +14,11 @@ export class ReactiveEffect {
      */
     depsTail: Link | undefined
 
+    /**
+     * 是否在收集依赖
+     */
+    tracking = false
+
     constructor(public fn: () => void) {
         this.fn = fn
     }
