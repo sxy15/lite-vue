@@ -26,6 +26,8 @@ export interface Link {
     nextDep: Link | undefined
 }
 
+let linkPool: Link
+
 export function link(dep, sub) {
     // 尝试复用链表节点
     const currentDep = sub.depsTail
@@ -40,12 +42,23 @@ export function link(dep, sub) {
         return
     }
 
-    const newLink = {
-        sub,
-        dep,
-        nextDep,
-        nextSub: undefined,
-        prevSub: undefined
+    let newLink
+
+    // 复用linkPool
+    if (linkPool) {
+        newLink = linkPool
+        linkPool = linkPool.nextDep
+        newLink.nextDep = nextDep
+        newLink.sub = sub
+        newLink.dep = dep
+    } else {
+        newLink = {
+            sub,
+            dep,
+            nextDep,
+            nextSub: undefined,
+            prevSub: undefined
+        }
     }
 
     if (dep.subsTail) {
@@ -131,7 +144,10 @@ function clearTracking(link) {
         }
 
         link.dep = link.sub = undefined
-        link.nextDep = undefined
+        // 把不要的节点给 linkPool
+        link.nextDep = linkPool
+        linkPool = link
+
         link = nextDep
     }
 }
