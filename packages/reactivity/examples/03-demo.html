@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <button id="flagBtn">flag</button>
+    <button id="nameBtn">name</button>
+    <button id="ageBtn">age</button>
+    <script type="module">
+        // import { ref, effect } from '../../../node_modules/vue/dist/vue.esm-browser.prod.js'
+        import { ref, effect } from '../dist/reactivity.esm.js'
+
+        const flag = ref(true)
+        const name = ref('suxinyi')
+        const age = ref(10)
+
+        const app = document.getElementById('app')
+        const flagBtn = document.getElementById('flagBtn')
+        const nameBtn = document.getElementById('nameBtn')
+        const ageBtn = document.getElementById('ageBtn')
+
+        const e = effect(() => {
+            if (flag.value) {
+                app.innerHTML = name.value
+            } else {
+                app.innerHTML = age.value
+            }
+            console.count('effect')
+        })
+
+        console.dir(e)
+
+        flagBtn.addEventListener('click', () => {
+            flag.value = !flag.value
+        })
+        nameBtn.addEventListener('click', () => {
+            name.value = name.value + Math.random()
+        })
+        ageBtn.addEventListener('click', () => {
+            age.value++
+        })
+    </script>
+</body>
+
+</html>
