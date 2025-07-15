@@ -3,7 +3,7 @@ import { ReactiveEffect } from './effect';
 /**
  * 依赖项
  */
-export interface Dep {
+export interface Dependency {
     subs: Link | undefined
     subsTail: Link | undefined
 }
@@ -22,7 +22,7 @@ export interface Link {
     sub: Sub
     nextSub: Link | undefined
     prevSub: Link | undefined
-    dep: Dep
+    dep: Dependency
     nextDep: Link | undefined
 }
 
