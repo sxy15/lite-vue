@@ -1,4 +1,4 @@
-import { isObject } from "@vue/shared"
+import { hasChanged, isObject } from "@vue/shared"
 import { link, propagate, type Link } from "./system"
 import { activeSub } from "./effect"
 
@@ -21,8 +21,13 @@ const mutableHandlers = {
         return Reflect.get(target, key, receiver)
     },
     set(target, key, value, receiver) {
+        const oldValue = target[key]
+
         const res = Reflect.set(target, key, value, receiver)
-        trigger(target, key)
+
+        if (hasChanged(oldValue, value)) {
+            trigger(target, key)
+        }
         return res
     }
 }
