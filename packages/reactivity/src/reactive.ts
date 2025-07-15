@@ -6,6 +6,34 @@ export function reactive(target) {
     return createReactiveObject(target)
 }
 
+const mutableHandlers = {
+    get(target, key, receiver) {
+        track(target, key)
+        /**
+         * {
+         *  a: 10,
+         *  get count() {
+         *      return this.a
+         *  }
+         * }
+         * receiver 用来保证getter中的this指向正确
+         */
+        return Reflect.get(target, key, receiver)
+    },
+    set(target, key, value, receiver) {
+        const res = Reflect.set(target, key, value, receiver)
+        trigger(target, key)
+        return res
+    }
+}
+
+/**
+ * reactiveMap 用来缓存已经代理过的对象
+ */
+const reactiveMap = new WeakMap()
+
+const reactiveSet = new WeakSet()
+
 function createReactiveObject(target) {
     /**
      * reactive必须接收一个对象
@@ -14,26 +42,25 @@ function createReactiveObject(target) {
         return target
     }
 
-    const proxy = new Proxy(target, {
-        get(target, key, receiver) {
-            track(target, key)
-            /**
-             * {
-             *  a: 10,
-             *  get count() {
-             *      return this.a
-             *  }
-             * }
-             * receiver 用来保证getter中的this指向正确
-             */
-            return Reflect.get(target, key, receiver)
-        },
-        set(target, key, value, receiver) {
-            const res = Reflect.set(target, key, value, receiver)
-            trigger(target, key)
-            return res
-        }
-    })
+    // 如果这个 target 是不是响应式对象，直接返回
+    if (isReactive(target)) {
+        return target
+    }
+
+    /**
+     * 如果已经代理过，就直接返回
+     */
+    const existingProxy = reactiveMap.get(target)
+
+    if (existingProxy) {
+        return existingProxy
+    }
+
+    const proxy = new Proxy(target, mutableHandlers)
+
+    reactiveMap.set(target, proxy)
+
+    reactiveSet.add(proxy)
 
     return proxy
 }
@@ -91,4 +118,8 @@ class Dep {
     constructor() {
 
     }
+}
+
+export function isReactive(target) {
+    return reactiveSet.has(target)
 }
