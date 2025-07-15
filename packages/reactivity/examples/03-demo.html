@@ -25,13 +25,18 @@
         const nameBtn = document.getElementById('nameBtn')
         const ageBtn = document.getElementById('ageBtn')
 
+        let count = 0
+
         const e = effect(() => {
+            console.count('effect')
+
+            // if (count > 0) return
+            // count++
             if (flag.value) {
                 app.innerHTML = name.value
             } else {
                 app.innerHTML = age.value
             }
-            console.count('effect')
         })
 
         console.dir(e)

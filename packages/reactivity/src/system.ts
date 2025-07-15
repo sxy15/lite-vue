@@ -43,7 +43,7 @@ export function link(dep, sub) {
     const newLink = {
         sub,
         dep,
-        nextDep: undefined,
+        nextDep,
         nextSub: undefined,
         prevSub: undefined
     }
@@ -78,4 +78,60 @@ export function propagate(subs) {
         link = link.nextSub
     }
     queueEffect.forEach(effect => effect.notify())
+}
+
+export function startTrack(sub) {
+    sub.depsTail = undefined
+}
+
+export function endTrack(sub) {
+    const depsTail = sub.depsTail
+    /**
+     * 1. depsTail 有，并且 depsTail 还有 nextDep，应该把它们的依赖关系清理掉
+     * 2. depsTail 没有，并且deps有，那就把所有的都清理
+     */
+    if (depsTail) {
+        if (depsTail.nextDep) {
+            clearTracking(depsTail.nextDep)
+            depsTail.nextDep = undefined
+        }
+    } else if (sub.deps) {
+        clearTracking(sub.deps)
+        sub.deps = undefined
+    }
+}
+
+/**
+ * 清理依赖关系
+ * @param link 
+ */
+function clearTracking(link) {
+    while (link) {
+        const { prevSub, nextSub, nextDep, dep } = link
+        /**
+         * 如果prevSub有，那就把prevSub的nextSub 指向 nextSub
+         * 如果没有，那就是头节点，把dep.subs指向当前节点的下一个
+         */
+        if (prevSub) {
+            prevSub.nextSub = nextSub
+            link.nextSub = undefined
+        } else {
+            dep.subs = nextSub
+        }
+
+        /**
+         * 如果下一个有，那就把nextSub的上一个节点指向当前节点的上一个
+         * 如果没有，那就是尾节点，把dep.subsTail 指向当前节点的上一个
+         */
+        if (nextSub) {
+            nextSub.prevSub = prevSub
+            link.prevSub = undefined
+        } else {
+            dep.subsTail = prevSub
+        }
+
+        link.dep = link.sub = undefined
+        link.nextDep = undefined
+        link = nextDep
+    }
 }

@@ -1,4 +1,4 @@
-import { Link } from "./system"
+import { endTrack, Link, startTrack } from "./system"
 
 // 用来保存当前执行的 effect
 export let activeSub
@@ -24,11 +24,12 @@ export class ReactiveEffect {
         // 每次执行fn之前，把this 放到 activeSub 中
         activeSub = this
 
-        this.depsTail = undefined
+        startTrack(this)
 
         try {
             return this.fn()
         } finally {
+            endTrack(this)
             // 执行完之后，清空 activeSub
             activeSub = prevSub
         }
