@@ -1,6 +1,7 @@
 import { hasChanged, isObject } from "@vue/shared"
 import { link, propagate, type Link } from "./system"
 import { activeSub } from "./effect"
+import { isRef } from './ref'
 
 export function reactive(target) {
     return createReactiveObject(target)
@@ -18,7 +19,11 @@ const mutableHandlers = {
          * }
          * receiver 用来保证getter中的this指向正确
          */
-        return Reflect.get(target, key, receiver)
+        const res = Reflect.get(target, key, receiver)
+        if (isRef(res)) {
+            return res.value
+        }
+        return res
     },
     set(target, key, value, receiver) {
         const oldValue = target[key]
