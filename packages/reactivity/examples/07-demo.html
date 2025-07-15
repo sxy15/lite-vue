@@ -13,14 +13,22 @@
         import { reactive, ref, effect } from '../dist/reactivity.esm.js'
 
         const a = ref(0)
-        const state = reactive({ a })
+        /**
+         * 如果state.a是一个ref，那么就直接给它 .value
+         * 如果更新了state.a 那么会修改原始的 ref.value的值等于newValue
+         * 如果newValue是一个ref，那就算了
+         */
+        const state = reactive({ a, b: { c: 0 } })
 
         const e = effect(() => {
-            console.log(state.a)
+            // console.log(state.a)
+            console.log(state.b.c)
         })
 
         setTimeout(() => {
-            state.a = 1
+            // state.a = 1
+            state.b.c = 1
+            // state.a = ref(1)
         }, 1000)
     </script>
 </body>
