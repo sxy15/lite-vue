@@ -3,6 +3,10 @@ import { endTrack, Link, startTrack } from "./system"
 // 用来保存当前执行的 effect
 export let activeSub
 
+export function setActiveSub(sub) {
+    activeSub = sub
+}
+
 export class ReactiveEffect {
     /**
      * 用来保存当前effect 收集的依赖
@@ -19,6 +23,8 @@ export class ReactiveEffect {
      */
     tracking = false
 
+    dirty = true
+
     constructor(public fn: () => void) {
         this.fn = fn
     }
@@ -27,7 +33,7 @@ export class ReactiveEffect {
         // 先将当前的effect保存起来，用来处理嵌套的逻辑
         const prevSub = activeSub
         // 每次执行fn之前，把this 放到 activeSub 中
-        activeSub = this
+        setActiveSub(this)
 
         startTrack(this)
 
@@ -35,8 +41,9 @@ export class ReactiveEffect {
             return this.fn()
         } finally {
             endTrack(this)
-            // 执行完之后，清空 activeSub
-            activeSub = prevSub
+
+            // 执行完之后，恢复之前的effect
+            setActiveSub(prevSub)
         }
     }
 

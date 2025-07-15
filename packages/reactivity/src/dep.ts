@@ -31,8 +31,6 @@ export function track(target, key) {
     }
 
     link(dep, activeSub)
-
-    console.log('dep', dep, key)
 }
 
 export function trigger(target, key) {

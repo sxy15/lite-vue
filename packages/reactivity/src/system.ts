@@ -13,6 +13,7 @@ export interface Dependency {
 export interface Sub {
     deps: Link | undefined
     depsTail: Link | undefined
+    tracking: boolean
 }
 
 /**
@@ -80,6 +81,19 @@ export function link(dep, sub) {
 }
 
 /**
+ * 更新计算属性
+ * 1. 调用update
+ * 2. 通知subs链表上所有的sub重新执行
+ * @param sub 
+ */
+function processComputedUpdate(sub) {
+    // update return true 代表值发生了变化
+    if (sub.subs && sub.update()) {
+        propagate(sub.subs)
+    }
+}
+
+/**
  * 传播更新
  * @param subs 
  */
@@ -88,8 +102,13 @@ export function propagate(subs) {
     let queueEffect = []
     while (link) {
         const sub = link.sub
-        if (!sub.tracking) {
-            queueEffect.push(link.sub)
+        if (!sub.tracking && !sub.dirty) {
+            sub.dirty = true
+            if ('update' in sub) {
+                processComputedUpdate(sub)
+            } else {
+                queueEffect.push(link.sub)
+            }
         }
         link = link.nextSub
     }
@@ -104,6 +123,8 @@ export function startTrack(sub) {
 export function endTrack(sub) {
     sub.tracking = false
     const depsTail = sub.depsTail
+
+    sub.dirty = false
     /**
      * 1. depsTail 有，并且 depsTail 还有 nextDep，应该把它们的依赖关系清理掉
      * 2. depsTail 没有，并且deps有，那就把所有的都清理
