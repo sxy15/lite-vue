@@ -31,17 +31,17 @@ export const mutableHandlers = {
         const targetIsArray = Array.isArray(target)
         const oldLength = targetIsArray ? target.length : 0
 
-        const res = Reflect.set(target, key, value, receiver)
-
         /**
-         * const a = ref(0)
-         * target = { a }
-         * 更新target.a = 1，就等于更新了a.value
-         */
+          * const a = ref(0)
+          * target = { a }
+          * 更新target.a = 1，就等于更新了a.value
+          */
         if (isRef(oldValue) && !isRef(value)) {
             oldValue.value = value
             return true // 直接return, 不触发trigger。因为ref.value 已经触发了
         }
+
+        const res = Reflect.set(target, key, value, receiver)
 
         if (hasChanged(oldValue, value)) {
             trigger(target, key)
