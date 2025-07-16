@@ -38,11 +38,24 @@ export function trigger(target, key) {
     if (!depsMap) {
         return
     }
-    const dep = depsMap.get(key)
-    if (!dep) {
-        return
+
+    //数组 & key === length
+    const targetIsArray = Array.isArray(target)
+    if (targetIsArray && key === 'length') {
+        const length = target.length
+        depsMap.forEach((dep, depKey) => {
+            if (depKey >= length || depKey === 'length') {
+                // 通知大于等于length的effect重新执行 | length
+                propagate(dep.subs)
+            }
+        })
+    } else {
+        const dep = depsMap.get(key)
+        if (!dep) {
+            return
+        }
+        propagate(dep.subs)
     }
-    propagate(dep.subs)
 }
 
 class Dep {

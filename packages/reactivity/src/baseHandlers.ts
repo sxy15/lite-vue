@@ -28,6 +28,9 @@ export const mutableHandlers = {
     set(target, key, value, receiver) {
         const oldValue = target[key]
 
+        const targetIsArray = Array.isArray(target)
+        const oldLength = targetIsArray ? target.length : 0
+
         const res = Reflect.set(target, key, value, receiver)
 
         /**
@@ -42,6 +45,15 @@ export const mutableHandlers = {
 
         if (hasChanged(oldValue, value)) {
             trigger(target, key)
+        }
+
+        const newLength = targetIsArray ? target.length : 0
+        /**
+         * 隐式更新了 length
+         * push pop shift unshift
+         */
+        if (targetIsArray && newLength !== oldLength && key !== 'length') {
+            trigger(target, 'length')
         }
         return res
     }
