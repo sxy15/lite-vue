@@ -78,3 +78,21 @@ export function triggerRef(dep: RefImpl<any>) {
         propagate(dep.subs)
     }
 }
+
+class ObjectRefImpl {
+    [ReactiveFlags.IS_REF] = true
+
+    constructor(public _object, public _key) { }
+
+    get value() {
+        return this._object[this._key]
+    }
+
+    set value(nv) {
+        this._object[this._key] = nv
+    }
+}
+
+export function toRef(target, key) {
+    return new ObjectRefImpl(target, key)
+}
