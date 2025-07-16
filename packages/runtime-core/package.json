@@ -1,15 +1,15 @@
 {
-  "name": "vue",
+  "name": "@vue/runtime-core",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/vue.cjs.js",
-  "module": "dist/vue.esm.js",
+  "main": "dist/runtime-core.cjs.js",
+  "module": "dist/runtime-core.esm.js",
   "files": [
     "dist"
   ],
   "sideEffects": false,
   "buildOptions": {
-    "name": "Vue",
+    "name": "RuntimeCore",
     "formats": [
       "esm-bundler",
       "esm-browser",
@@ -21,7 +21,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@vue/runtime-dom": "workspace:^",
+    "@vue/reactivity": "workspace:^",
     "@vue/shared": "workspace:^"
   }
 }

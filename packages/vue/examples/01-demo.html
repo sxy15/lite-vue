@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module">
+        import { h, render, createRenderer } from '../../../node_modules/vue/dist/vue.esm-browser.js'
+
+        import { nodeOps } from '../dist/vue.esm.js'
+
+        /**
+         * runtime-core 依赖 reactivity 模块
+         * runtime-dom 依赖 runtime-core 模块
+         * vue包导出 runtime-dom
+         */
+
+        const renderer = createRenderer(nodeOps)
+
+        console.log(renderer)
+
+        const vNode = h('div', 'hello world')
+
+        console.log(vNode)
+
+        renderer.render(vNode, app)
+
+        setTimeout(() => {
+            renderer.render(null, app)
+        }, 1000)
+    </script>
+</body>
+
+</html>
