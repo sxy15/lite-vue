@@ -10,22 +10,32 @@
 <body>
     <script type="module">
         // import { reactive, ref, effect, toRef } from '../../../node_modules/vue/dist/vue.esm-browser.prod.js'
-        import { reactive, effect, toRef } from '../dist/reactivity.esm.js'
+        import { reactive, effect, toRef, toRefs, proxyRefs, unref } from '../dist/reactivity.esm.js'
 
         const state = reactive({
             name: 'li',
             age: 18
         })
 
-        const name = toRef(state, 'name')
+        // const name = toRef(state, 'name')
+        const { name, age } = toRefs(state)
+        const setupState = proxyRefs({
+            ...toRefs(state)
+        })
+
+        console.log(setupState.name)
+
+        console.log(unref(name))
 
         effect(() => {
             console.log(name.value)
+            console.log(age.value)
         })
 
         setTimeout(() => {
             // state.name = 'zs'
             name.value = 'zs'
+            state.age++
         }, 1000)
     </script>
 </body>

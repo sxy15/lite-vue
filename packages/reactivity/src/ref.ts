@@ -96,3 +96,41 @@ class ObjectRefImpl {
 export function toRef(target, key) {
     return new ObjectRefImpl(target, key)
 }
+
+export function toRefs(target) {
+    const res = {}
+
+    for (const key in target) {
+        res[key] = toRef(target, key)
+    }
+
+    return res
+}
+
+export function unref(value) {
+    return isRef(value) ? value.value : value
+}
+
+export function proxyRefs(target) {
+    return new Proxy(target, {
+        get(target, key, receiver) {
+            /**
+             * 自动解包ref
+             */
+            const res = Reflect.get(target, key, receiver)
+
+            return unref(res)
+        },
+        set(target, key, newValue, receiver) {
+            const oldValue = target[key]
+
+            if (isRef(oldValue) && !isRef(newValue)) {
+                oldValue.value = newValue
+                return true
+            }
+
+            const res = Reflect.set(target, key, newValue, receiver)
+            return res
+        }
+    })
+}
