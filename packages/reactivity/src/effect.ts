@@ -9,6 +9,10 @@ export function setActiveSub(sub) {
 
 export class ReactiveEffect {
     /**
+     * 表示当前effect是否激活
+     */
+    active = true
+    /**
      * 用来保存当前effect 收集的依赖
      */
     deps: Link | undefined
@@ -30,6 +34,9 @@ export class ReactiveEffect {
     }
 
     run() {
+        if (!this.active) {
+            return this.fn()
+        }
         // 先将当前的effect保存起来，用来处理嵌套的逻辑
         const prevSub = activeSub
         // 每次执行fn之前，把this 放到 activeSub 中
@@ -59,6 +66,15 @@ export class ReactiveEffect {
      */
     scheduler() {
         this.run()
+    }
+
+    stop() {
+        if (this.active) {
+            // 清理依赖
+            startTrack(this)
+            endTrack(this)
+            this.active = false
+        }
     }
 }
 
