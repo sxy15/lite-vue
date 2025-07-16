@@ -40,11 +40,21 @@ export function watch(source, cb, options) {
 
     let oldValue
 
+    let cleanup = null
+    function onCleanup(cb) {
+        cleanup = cb
+    }
+
     function job() {
+        // 清理上一次的副作用
+        if (cleanup) {
+            cleanup()
+            cleanup = null
+        }
         // 执行effect.run 拿到 getter的返回值，不能直接执行 getter，因为要收集依赖
         const newValue = effect.run()
         // 执行用户回调cb
-        cb(newValue, oldValue)
+        cb(newValue, oldValue, onCleanup)
         oldValue = newValue
     }
 
