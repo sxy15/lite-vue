@@ -15,3 +15,7 @@ export function hasChanged(oldValue: any, newValue: any) {
 export function isFunction(value: unknown): value is Function {
     return typeof value === 'function'
 }
+
+export function isOn(key) {
+    return /^on[A-Z]/.test(key)
+}

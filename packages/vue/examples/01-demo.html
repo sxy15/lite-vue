@@ -12,7 +12,7 @@
     <script type="module">
         import { h, render, createRenderer } from '../../../node_modules/vue/dist/vue.esm-browser.js'
 
-        import { nodeOps } from '../dist/vue.esm.js'
+        import { renderOptions } from '../dist/vue.esm.js'
 
         /**
          * runtime-core 依赖 reactivity 模块
@@ -20,19 +20,27 @@
          * vue包导出 runtime-dom
          */
 
-        const renderer = createRenderer(nodeOps)
+        const renderer = createRenderer(renderOptions)
 
-        console.log(renderer)
-
-        const vNode = h('div', 'hello world')
-
-        console.log(vNode)
+        const vNode = h('div', {
+            style: { color: 'red' },
+            id: 'v1',
+            onClick() {
+                console.log('click')
+            }
+        }, 'hello world')
+        const vNode2 = h('div', {
+            id: 'v2',
+            onClick() {
+                console.log('click2')
+            }
+        }, 'hello world')
 
         renderer.render(vNode, app)
 
         setTimeout(() => {
-            renderer.render(null, app)
-        }, 1000)
+            renderer.render(vNode2, app)
+        }, 3000)
     </script>
 </body>
 
