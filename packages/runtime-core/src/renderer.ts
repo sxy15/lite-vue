@@ -1,7 +1,40 @@
 import { ShapeFlags } from "@vue/shared"
-import { isSameVNodeType } from "./vnode"
+import { isSameVNodeType, normalizeVNode, Text } from "./vnode"
 
 export function createRenderer(options) {
+    /**
+     * 元素的挂载 更新
+     */
+    const processElement = (n1, n2, container, anchor) => {
+        if (n1 === null) {
+            // 挂载
+            mountElement(n2, container, anchor)
+        } else {
+            // 更新
+            patchElement(n1, n2)
+        }
+    }
+    /**
+     * 处理文本的挂载 更新
+     * @param n1 
+     * @param n2 
+     * @param container 
+     * @param anchor 
+     */
+    const processText = (n1, n2, container, anchor) => {
+        if (n1 === null) {
+            // 挂载
+            const el = hostCreateText(n2.children)
+            n2.el = el
+            hostInsert(el, container, anchor)
+        } else {
+            // 更新
+            n2.el = n1.el
+            if (n1.children !== n2.children) {
+                hostSetText(n2.el, n2.children)
+            }
+        }
+    }
 
     /**
      * 更新 挂载都用这个函数
@@ -21,12 +54,18 @@ export function createRenderer(options) {
             n1 = null
         }
 
-        if (n1 === null) {
-            // 挂载
-            mountElement(n2, container, anchor)
-        } else {
-            // 更新
-            patchElement(n1, n2)
+        const { shapeFlag, type } = n2
+        switch (type) {
+            case Text:
+                processText(n1, n2, container, anchor)
+                break
+            default:
+                if (shapeFlag & ShapeFlags.ELEMENT) {
+                    // 处理dom元素 div span p
+                    processElement(n1, n2, container, anchor)
+                } else if (shapeFlag & ShapeFlags.COMPONENT) {
+                    // 处理组件
+                }
         }
     }
 
@@ -60,7 +99,7 @@ export function createRenderer(options) {
 
     const mountChildren = (children, el) => {
         for (let i = 0; i < children.length; i++) {
-            const child = children[i]
+            const child = children[i] = normalizeVNode(children[i])
             patch(null, child, el)
         }
     }
@@ -199,7 +238,7 @@ export function createRenderer(options) {
          */
         while (i <= e1 && i <= e2) {
             const n1 = c1[i]
-            const n2 = c2[i]
+            const n2 = c2[i] = normalizeVNode(c2[i])
 
             // 如果 n1 n2 是同一个类型的子节点，就更新
             if (isSameVNodeType(n1, n2)) {
@@ -220,7 +259,7 @@ export function createRenderer(options) {
          */
         while (i <= e1 && i <= e2) {
             const n1 = c1[e1]
-            const n2 = c2[e2]
+            const n2 = c2[e2] = normalizeVNode(c2[e2])
 
             // 如果 n1 n2 是同一个类型的子节点，就更新
             if (isSameVNodeType(n1, n2)) {
@@ -240,7 +279,7 @@ export function createRenderer(options) {
             const nextPos = e2 + 1
             const anchor = nextPos < c2.length ? c2[nextPos].el : null
             while (i <= e2) {
-                patch(null, c2[i], container, anchor)
+                patch(null, c2[i] = normalizeVNode(c2[i]), container, anchor)
                 i++
             }
         } else if (i > e2) {
@@ -275,7 +314,7 @@ export function createRenderer(options) {
 
             // 遍历新的 s2 - e2之间的节点，存储 key => index map
             for (let j = s2; j <= e2; j++) {
-                const n2 = c2[j]
+                const n2 = c2[j] = normalizeVNode(c2[j])
                 keyToNewIndexMap.set(n2.key, j)
             }
 

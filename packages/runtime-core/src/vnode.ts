@@ -1,7 +1,20 @@
-import { isArray, isString, ShapeFlags } from "@vue/shared"
+import { isArray, isNumber, isString, ShapeFlags } from "@vue/shared"
+
+/**
+ * 文本节点标记
+ */
+export const Text = Symbol('v-text')
 
 export function isSameVNodeType(n1, n2) {
     return n1.type === n2.type && n1.key === n2.key
+}
+
+export function normalizeVNode(vnode) {
+    if (isString(vnode) || isNumber(vnode)) {
+        return createVNode(Text, null, String(vnode))
+    }
+
+    return vnode
 }
 
 /**
