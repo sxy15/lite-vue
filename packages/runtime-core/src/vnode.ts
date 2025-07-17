@@ -1,5 +1,9 @@
 import { isArray, isString, ShapeFlags } from "@vue/shared"
 
+export function isSameVNodeType(n1, n2) {
+    return n1.type === n2.type && n1.key === n2.key
+}
+
 /**
  * 创建虚拟节点
  * @param type 节点类型
