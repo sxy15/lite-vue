@@ -268,11 +268,19 @@ export function createRenderer(options) {
             let s2 = i
 
             const keyToNewIndexMap = new Map()
+
+            const newIndexToOldIndexMap = new Array(e2 - s2 + 1)
+            // -1 代表不需要计算
+            newIndexToOldIndexMap.fill(-1)
+
             // 遍历新的 s2 - e2之间的节点，存储 key => index map
             for (let j = s2; j <= e2; j++) {
                 const n2 = c2[j]
                 keyToNewIndexMap.set(n2.key, j)
             }
+
+            let pos = -1
+            let moved = false // 是否需要移动
             /**
              * 遍历老的子节点（s1 - e1），查找这个key在新的里面有没有，有就 patch，没就卸载
              */
@@ -280,11 +288,22 @@ export function createRenderer(options) {
                 const n1 = c1[j]
                 const newIndex = keyToNewIndexMap.get(n1.key)
                 if (newIndex != null) {
+                    if (newIndex > pos) { // 每一次都比上一次大就说明是连续递增不需要计算了，否则true需要计算
+                        pos = newIndex
+                    } else {
+                        moved = true
+                    }
+                    newIndexToOldIndexMap[newIndex] = j
                     patch(n1, c2[newIndex], container)
                 } else {
                     unmount(n1)
                 }
             }
+
+            // console.log(newIndexToOldIndexMap) // moved false代表不需要移动
+            const newIndexSequence = moved ? getSequence(newIndexToOldIndexMap) : []
+            const sequenceSet = new Set(newIndexSequence)
+            // console.log(newIndexSequence)
 
             /**
              * 遍历新的子元素，调整顺序
@@ -294,7 +313,13 @@ export function createRenderer(options) {
                 // 拿到它的下一个子元素，依次倒序插入
                 const anchor = c2[j + 1]?.el || null
                 if (n2.el) {
-                    hostInsert(n2.el, container, anchor)
+                    // 需要移动再进去
+                    if (moved) {
+                        // 不在最长递增子序列中表示需要移动
+                        if (!sequenceSet.has(j)) {
+                            hostInsert(n2.el, container, anchor)
+                        }
+                    }
                 } else {
                     // 新节点
                     patch(null, n2, container, anchor)
@@ -348,4 +373,70 @@ export function createRenderer(options) {
             return {}
         }
     }
+}
+
+// 求最长递增子序列
+function getSequence(arr) {
+    const result = []
+
+    // 记录前驱节点
+    const map = new Map()
+
+    for (let i = 0; i < arr.length; i++) {
+        const item = arr[i]
+
+        // -1 不在计算范围内
+        if (item === -1 || item === undefined) {
+            continue
+        }
+
+        if (result.length === 0) {
+            // 如果result里面一个都没有，放入索引
+            result.push(i)
+            continue
+        }
+
+        const lastIndex = result[result.length - 1]
+        const lastItem = arr[lastIndex]
+
+        // 如果当前大于上一个，放入索引 同时记录前驱节点
+        if (item > lastItem) {
+            result.push(i)
+            map.set(i, lastIndex)
+            continue
+        }
+
+        // item 小于 lastItem, 查找最合适的位置
+        let left = 0
+        let right = result.length - 1
+        let middle
+
+        while (left < right) {
+            middle = (left + right) >> 1
+            if (arr[result[middle]] < item) {
+                left = middle + 1
+            } else {
+                right = middle
+            }
+        }
+
+        if (arr[result[left]] > item) {
+            result[left] = i
+            if (left > 0) {
+                map.set(i, result[left - 1])
+            }
+        }
+    }
+
+    // 反向追溯，纠正顺序
+    let l = result.length
+    let last = result[l - 1]
+
+    while (l > 0) {
+        l--
+        result[l] = last
+        last = map.get(last)
+    }
+
+    return result
 }
