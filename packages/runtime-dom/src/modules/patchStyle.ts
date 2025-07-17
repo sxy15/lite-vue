@@ -1,6 +1,5 @@
 export function patchStyle(el, prevValue, nextValue) {
     const style = el.style
-
     /**
      * 新样式设置到style
      */
@@ -15,7 +14,7 @@ export function patchStyle(el, prevValue, nextValue) {
      */
     if (prevValue) {
         for (const key in prevValue) {
-            if (nextValue && !(key in nextValue)) {
+            if (!nextValue?.[key]) {
                 style[key] = null
             }
         }

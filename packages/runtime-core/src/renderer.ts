@@ -172,7 +172,16 @@ export function createRenderer(options) {
         /**
          * 全量diff
          * 1. 双端 diff
+         *  1.1 头部对比
+         *  1.2 尾部对比
+         *  
+         *  根据双端对比得出
+         *  i > e1，表示老的少，新的多，需要挂载新的,范围是 i - e2
+         *  i > e2，表示老的多，新的少，需要卸载老的,范围是 i - e1
          * 
+         * 2. 乱序
+         *  c1 => [a, b, c, d, e]
+         *  c2 => [a, c, d, b ,e]
          */
 
         // 开始对比的下标
@@ -242,7 +251,58 @@ export function createRenderer(options) {
                 unmount(c1[i])
                 i++
             }
+        } else {
+            /**
+             * 乱序
+             *  c1 => [a, b, c, d, e]
+             *  c2 => [a, c, d, b ,e]
+             *  开始时： i = 0, e1 = 4, e2 = 4
+             *  双端对比完：i = 1, e1 = 3, e2 = 3
+             * 
+             *  找到key 相同的虚拟节点，让它们patch
+             */
+
+            // 老的子节点开始查找的位置
+            let s1 = i
+            // 新的子节点开始查找的位置
+            let s2 = i
+
+            const keyToNewIndexMap = new Map()
+            // 遍历新的 s2 - e2之间的节点，存储 key => index map
+            for (let j = s2; j <= e2; j++) {
+                const n2 = c2[j]
+                keyToNewIndexMap.set(n2.key, j)
+            }
+            /**
+             * 遍历老的子节点（s1 - e1），查找这个key在新的里面有没有，有就 patch，没就卸载
+             */
+            for (let j = s1; j <= e1; j++) {
+                const n1 = c1[j]
+                const newIndex = keyToNewIndexMap.get(n1.key)
+                if (newIndex != null) {
+                    patch(n1, c2[newIndex], container)
+                } else {
+                    unmount(n1)
+                }
+            }
+
+            /**
+             * 遍历新的子元素，调整顺序
+             */
+            for (let j = e2; j >= s2; j--) {
+                const n2 = c2[j]
+                // 拿到它的下一个子元素，依次倒序插入
+                const anchor = c2[j + 1]?.el || null
+                if (n2.el) {
+                    hostInsert(n2.el, container, anchor)
+                } else {
+                    // 新节点
+                    patch(null, n2, container, anchor)
+                }
+            }
         }
+
+        console.log('i', i, 'e1', e1, 'e2', e2)
     }
 
     const patchProps = (el, oldProps, newProps) => {

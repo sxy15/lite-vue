@@ -31,7 +31,7 @@ export function createVNode(type, props?, children?) {
          * 
          * 1001 & 0001 = 0001
          */
-        console.log('dom')
+        // console.log('dom')
     }
 
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
@@ -40,7 +40,7 @@ export function createVNode(type, props?, children?) {
          * 1000
          * 1000
          */
-        console.log('text')
+        // console.log('text')
     }
 
     const vnode = {

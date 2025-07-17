@@ -16,7 +16,6 @@ import { patchAttr } from "./modules/patchAttr"
  * @returns 
  */
 export function patchProp(el, key, prevValue, nextValue) {
-    // console.log(el, key, prevValue, nextValue)
 
     if (key === 'class') {
         return patchClass(el, nextValue)

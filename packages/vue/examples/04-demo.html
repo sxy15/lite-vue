@@ -25,8 +25,25 @@
          * 8. h('div', { class: 'container'}, h('span', 'hello'), h('span', 'hello')) //第二个参数为props, 后边的都为children
          */
         // const vnode = h('div', { style: { color: 'green' } }, [h('span', 'hello'), h('span', 'hello')])
-        const vnode = h('div', [h('p', { key: 'c' }, 'c'), h('p', { key: 'a', style: { color: 'red' } }, 'a'), h('p', { key: 'b' }, 'b')])
-        const vnode2 = h('div', [h('p', { key: 'a' }, 'a'), h('p', { key: 'b' }, 'b')])
+        // const vnode = h('div', [h('p', { key: 'c' }, 'c'), h('p', { key: 'a', style: { color: 'red' } }, 'a'), h('p', { key: 'b' }, 'b')])
+        // const vnode2 = h('div', [h('p', { key: 'a' }, 'a'), h('p', { key: 'b' }, 'b')])
+
+        const vnode = h('div', [
+            h('p', { key: 'a', style: { color: 'red' } }, 'a'),
+            h('p', { key: 'b', style: { color: 'red' } }, 'b'),
+            h('p', { key: 'c', style: { color: 'red' } }, 'c'),
+            h('p', { key: 'd', style: { color: 'red' } }, 'd'),
+            h('p', { key: 'e', style: { color: 'red' } }, 'e'),
+            h('p', { key: 'j', style: { color: 'red' } }, 'j'),
+        ])
+
+        const vnode2 = h('div', [
+            h('p', { key: 'a' }, 'a'),
+            h('p', { key: 'c', style: { color: 'blue' } }, 'c'),
+            h('p', { key: 'd', style: { color: 'blue' } }, 'd'),
+            h('p', { key: 'b', style: { color: 'blue' } }, 'b'),
+            h('p', { key: 'e', style: { color: 'blue' } }, 'e'),
+        ])
 
         render(vnode, app)
 
