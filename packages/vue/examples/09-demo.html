@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module">
+        // import { render, h, Text, createApp, ref } from '../../../node_modules/vue/dist/vue.esm-browser.js'
+
+        import { render, Text, h, createApp, nextTick, ref } from '../dist/vue.esm.js'
+
+        const Child = {
+            props: ['age'],
+            setup(props, { emit, slots }) {
+                return () => {
+                    return h('div', [
+                        // slots.header(),
+                        slots.default(),
+                        // slots.footer({ a: 1 }),
+                    ])
+                }
+            }
+        }
+
+        const Comp1 = {
+            props: {
+                msg: String
+            },
+            setup(props, { attrs }) {
+                const age = ref(10)
+                return () => {
+                    /**
+                     * <Child>
+                     *  <template #header>
+                     *      <div>child header</div>
+                     *  </template>
+                     * </Child>
+                     */
+                    // return h('div', [
+                    //     h('div', '父组件的p'),
+                    //     h(Child, null, {
+                    //         // 具名插槽
+                    //         header: () => h('div', `child header`),
+                    //         // 作用域插槽
+                    //         footer: () => h('div', `child footer ${age.value}`),
+                    //         // 默认插槽
+                    //         default: () => h('div', `child default`),
+                    //     }),
+                    // ])
+
+                    return h('div', [
+                        h('div', '父组件的p'),
+                        h(Child, null, () => h('div', `child default`)),
+                    ])
+                }
+            },
+        }
+
+        createApp(Comp1, {}).mount(app)
+    </script>
+</body>
+
+</html>

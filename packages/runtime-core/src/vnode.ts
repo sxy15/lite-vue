@@ -17,12 +17,40 @@ export function normalizeVNode(vnode) {
     return vnode
 }
 
-function normalizeChildren(children) {
-    if (isNumber(children)) {
+function normalizeChildren(vnode, children) {
+    let { shapeFlag } = vnode
+
+    if (isArray(children)) {
+        /**
+         * children = [h('div', 'hello'), h('div', 'world')]
+         */
+        shapeFlag = shapeFlag | ShapeFlags.ARRAY_CHILDREN // 10000
+    } else if (isObject(children)) {
+
+        /**
+         * children = { default: () => h('div', 'hello'), header: () => h('div', 'header') }
+         */
+        if (shapeFlag & ShapeFlags.COMPONENT) {
+            // 组件就是插槽
+            shapeFlag = shapeFlag | ShapeFlags.SLOTS_CHILDREN
+        }
+
+    } else if (isFunction(children)) {
+        /**
+         * children = () => h('div', 'hello')
+         *  =>
+         *  { default: () => h('div', 'hello') }
+         */
+        shapeFlag = shapeFlag | ShapeFlags.SLOTS_CHILDREN
+        children = { default: children }
+
+    } else if (isNumber(children) || isString(children)) {
         children = String(children)
+        shapeFlag = shapeFlag | ShapeFlags.TEXT_CHILDREN // 1001
     }
 
-    return children
+    vnode.shapeFlag = shapeFlag
+    vnode.children = children
 }
 
 /**
@@ -32,8 +60,6 @@ function normalizeChildren(children) {
  * @param children 子节点
  */
 export function createVNode(type, props?, children?) {
-
-    children = normalizeChildren(children)
 
     let shapeFlag = 0
 
@@ -48,21 +74,20 @@ export function createVNode(type, props?, children?) {
         shapeFlag = ShapeFlags.FUNCTIONAL_COMPONENT // 10
     }
 
-    if (isString(children)) {
-        shapeFlag = shapeFlag | ShapeFlags.TEXT_CHILDREN // 1001
-    } else if (isArray(children)) {
-        shapeFlag = shapeFlag | ShapeFlags.ARRAY_CHILDREN // 10000
-    }
-
     const vnode = {
         __v_isVnode: true,
         type,
         props,
-        children,
+        children: null,
         shapeFlag,
         key: props?.key, // diff用
         el: null // 虚拟节点挂载的元素
     }
+
+    /**
+     * children的标准化和shapeFlag处理
+     */
+    normalizeChildren(vnode, children)
 
     return vnode
 }

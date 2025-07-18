@@ -6,6 +6,7 @@ import { ReactiveEffect } from "@vue/reactivity"
 import { queueJob } from "./scheduler"
 import { shouldUpdateComponent } from "./componentRenderUtils"
 import { updateProps } from "./componentProps"
+import { updateSlots } from "./componentSlots"
 
 export function createRenderer(options) {
     /**
@@ -86,7 +87,7 @@ export function createRenderer(options) {
 
 
 
-    const updateComponentRenderPre = (instance, nextVNode) => {
+    const updateComponentPreRender = (instance, nextVNode) => {
         /**
          * 复用组件实例
          * 更新props
@@ -95,7 +96,15 @@ export function createRenderer(options) {
         instance.vnode = nextVNode
         instance.next = null
 
+        /**
+         * 更新组件属性
+         */
         updateProps(instance, nextVNode)
+
+        /**
+         * 更新组件插槽
+         */
+        updateSlots(instance, nextVNode)
     }
 
     const setupRenderEffect = (instance, container, anchor) => {
@@ -113,7 +122,7 @@ export function createRenderer(options) {
                 let { vnode, render, next } = instance
                 // 如果有next 就是父组件传递的属性触发的更新
                 if (next) {
-                    updateComponentRenderPre(instance, next)
+                    updateComponentPreRender(instance, next)
                 } else {
                     next = vnode
                 }
