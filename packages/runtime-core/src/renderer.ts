@@ -1,6 +1,7 @@
 import { ShapeFlags } from "@vue/shared"
 import { isSameVNodeType, normalizeVNode, Text } from "./vnode"
 import { createAppAPI } from "./apiCreateApp"
+import { createComponentInstance, setupComponent } from "./component"
 
 export function createRenderer(options) {
     /**
@@ -37,6 +38,31 @@ export function createRenderer(options) {
         }
     }
 
+    const processComponent = (n1, n2, container, anchor) => {
+        if (n1 === null) {
+            // 挂载
+            mountComponent(n2, container, anchor)
+        } else {
+            // 更新
+            // updateComponent(n1, n2)
+        }
+    }
+
+    const mountComponent = (vnode, container, anchor) => {
+        /**
+         * 1.创建组件实例
+         * 2.初始化组件状态
+         * 3.挂载到页面
+         */
+        // 1.创建组件实例
+        const instance = createComponentInstance(vnode)
+        // 2.初始化组件状态
+        setupComponent(instance)
+        // 3.挂载到页面
+        const subTree = instance.render.call(instance.setupState)
+        patch(null, subTree, container, anchor)
+    }
+
     /**
      * 更新 挂载都用这个函数
      * @param n1 
@@ -66,6 +92,7 @@ export function createRenderer(options) {
                     processElement(n1, n2, container, anchor)
                 } else if (shapeFlag & ShapeFlags.COMPONENT) {
                     // 处理组件
+                    processComponent(n1, n2, container, anchor)
                 }
         }
     }

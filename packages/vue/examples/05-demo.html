@@ -12,7 +12,7 @@
     <script type="module">
         // import { render, h, Text, createRenderer } from '../../../node_modules/vue/dist/vue.esm-browser.js'
 
-        import { render, Text, h, createApp } from '../dist/vue.esm.js'
+        import { render, Text, h, createApp, ref } from '../dist/vue.esm.js'
 
         const vnode = h('div', null, ['hello', 'world'])
         const vnode2 = h('div', null, ['world', 'hello'])
@@ -25,13 +25,19 @@
         // }, 1000)
 
         const Comp = {
+            setup() {
+                const count = ref(0)
+
+                return {
+                    count
+                }
+            },
             render() {
-                return h('div', 'hello vue')
+                console.log(this)
+                return h('div', `hello vue ${this.count}`)
             }
         }
-        const vm = createApp(Comp, { msg: 'hello' })
-        console.log(vm)
-        vm.mount(app)
+        createApp(Comp, { msg: 'hello' }).mount(app)
     </script>
 </body>
 

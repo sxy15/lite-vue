@@ -1,4 +1,4 @@
-import { isArray, isNumber, isString, ShapeFlags } from "@vue/shared"
+import { isArray, isFunction, isNumber, isObject, isString, ShapeFlags } from "@vue/shared"
 
 /**
  * 文本节点标记
@@ -17,6 +17,14 @@ export function normalizeVNode(vnode) {
     return vnode
 }
 
+function normalizeChildren(children) {
+    if (isNumber(children)) {
+        children = String(children)
+    }
+
+    return children
+}
+
 /**
  * 创建虚拟节点
  * @param type 节点类型
@@ -25,35 +33,25 @@ export function normalizeVNode(vnode) {
  */
 export function createVNode(type, props?, children?) {
 
+    children = normalizeChildren(children)
+
     let shapeFlag = 0
 
     if (isString(type)) {
+        // div p span
         shapeFlag = ShapeFlags.ELEMENT // 1
+    } else if (isObject(type)) {
+        // 有状态组件
+        shapeFlag = ShapeFlags.STATEFUL_COMPONENT // 100
+    } else if (isFunction(type)) {
+        // 函数组件
+        shapeFlag = ShapeFlags.FUNCTIONAL_COMPONENT // 10
     }
 
     if (isString(children)) {
         shapeFlag = shapeFlag | ShapeFlags.TEXT_CHILDREN // 1001
     } else if (isArray(children)) {
         shapeFlag = shapeFlag | ShapeFlags.ARRAY_CHILDREN // 10000
-    }
-
-    if (shapeFlag & ShapeFlags.ELEMENT) {
-        /**
-         * 与运算
-         * 1 & 1 = 1
-         * 
-         * 1001 & 0001 = 0001
-         */
-        // console.log('dom')
-    }
-
-    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
-        /**
-         * 1001
-         * 1000
-         * 1000
-         */
-        // console.log('text')
     }
 
     const vnode = {
