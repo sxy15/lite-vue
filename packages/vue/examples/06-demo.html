@@ -13,7 +13,7 @@
     <script type="module">
         // import { render, h, Text, createRenderer } from '../../../node_modules/vue/dist/vue.esm-browser.js'
 
-        import { render, Text, h, createApp, ref } from '../dist/vue.esm.js'
+        import { render, Text, h, createApp, nextTick, ref } from '../dist/vue.esm.js'
 
         const Comp = {
             props: {
@@ -23,20 +23,39 @@
                 console.log(props, attrs)
                 const count = ref(0)
 
-                btn.onclick = () => {
-                    console.log(count.value)
-                    count.value++
-                }
-
                 return {
                     count
                 }
+
+                // return () => {
+                //     return h('div', {
+                //         onClick: () => {
+                //             count.value++
+                //             console.log('click')
+                //         }
+                //     }, `hello vue ${count.value} ${props.msg}`)
+                // }
             },
             render() {
-                return h('div', `hello vue ${this.count}`)
+                return h('div', {
+                    id: 'v1',
+                    onClick: async () => {
+                        this.count++
+                        this.count++
+                        this.count++
+
+                        const container = document.getElementById('v1')
+                        // nextTick(() => {
+                        //     console.log(container.innerHTML)
+                        // })
+                        await nextTick()
+                        console.log(container.innerHTML)
+                        console.log('click')
+                    }
+                }, `hello vue ${this.count} ${this.msg}`)
             }
         }
-        createApp(Comp, { msg: 'hello', age: 10 }).mount(app)
+        createApp(Comp, { msg: 'msg', age: 10 }).mount(app)
     </script>
 </body>
 

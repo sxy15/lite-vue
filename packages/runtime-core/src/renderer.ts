@@ -3,6 +3,7 @@ import { isSameVNodeType, normalizeVNode, Text } from "./vnode"
 import { createAppAPI } from "./apiCreateApp"
 import { createComponentInstance, setupComponent } from "./component"
 import { ReactiveEffect } from "@vue/reactivity"
+import { queueJob } from "./scheduler"
 
 export function createRenderer(options) {
     /**
@@ -60,15 +61,20 @@ export function createRenderer(options) {
         // 2.初始化组件状态
         setupComponent(instance)
 
+        setupRenderEffect(instance, container, anchor)
+    }
+
+    const setupRenderEffect = (instance, container, anchor) => {
         const componentUpdateFn = () => {
+            console.log('componentUpdateFn')
             // 3.区分挂载和更新
             if (!instance.isMounted) {
-                const subTree = instance.render.call(instance.setupState)
+                const subTree = instance.render.call(instance.proxy)
                 patch(null, subTree, container, anchor)
                 instance.isMounted = true
                 instance.subTree = subTree
             } else {
-                const subTree = instance.render.call(instance.setupState)
+                const subTree = instance.render.call(instance.proxy)
                 patch(instance.subTree, subTree, container, anchor)
                 instance.subTree = subTree
             }
@@ -76,7 +82,15 @@ export function createRenderer(options) {
 
         // 创建effect
         const effect = new ReactiveEffect(componentUpdateFn)
-        effect.run()
+        const update = effect.run.bind(effect)
+
+        instance.update = update
+
+        effect.scheduler = () => {
+            queueJob(update)
+        }
+
+        update()
     }
 
     /**
