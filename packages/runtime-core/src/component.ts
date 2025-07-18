@@ -26,6 +26,8 @@ export const createComponentInstance = (vnode) => {
 
     instance.ctx = { _: instance }
 
+    instance.emit = (event, ...args) => emit(instance, event, ...args)
+
     return instance
 }
 
@@ -41,6 +43,7 @@ export const setupComponent = (instance) => {
 const publicPropertiesMap = {
     $el: (i) => i.vnode.el,
     $attrs: (i) => i.attrs,
+    $emit: (i) => i.emit,
     $slots: (i) => i.slots,
     $refs: (i) => i.refs,
     $nextTick: (i) => {
@@ -128,5 +131,21 @@ function createSetupContext(instance) {
         get attrs() {
             return instance.attrs
         },
+
+        emit(event, ...args) {
+            emit(instance, event, ...args)
+        }
+    }
+}
+
+function emit(instance, event, ...args) {
+    /**
+     * foo => onFoo
+     */
+    const eventName = `on${event[0].toUpperCase() + event.slice(1)}`
+    const handler = instance.vnode.props[eventName]
+
+    if (isFunction(handler)) {
+        handler(...args)
     }
 }
