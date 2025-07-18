@@ -31,3 +31,7 @@ export function isString(value) {
 export function isNumber(value) {
     return typeof value === 'number'
 }
+
+export function hasOwn(obj: object, key: string | number | symbol) {
+    return Object.hasOwn(obj, key)
+}

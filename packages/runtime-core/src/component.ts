@@ -1,4 +1,6 @@
 import { proxyRefs } from "@vue/reactivity"
+import { initProps, normalizePropsOptions } from "./componentProps"
+import { isFunction } from "@vue/shared"
 
 export const createComponentInstance = (vnode) => {
     const { type, props } = vnode
@@ -6,6 +8,8 @@ export const createComponentInstance = (vnode) => {
         type,
         vnode,
         props,
+        // 用户声明的组件props
+        propsOptions: normalizePropsOptions(type.props),
         attrs: {},
         // setup返回的状态
         setupState: null,
@@ -21,11 +25,33 @@ export const createComponentInstance = (vnode) => {
 }
 
 export const setupComponent = (instance) => {
-    const { type, props } = instance
+    /**
+     * 初始化属性
+     */
+    const { type } = instance
 
-    const setupResult = proxyRefs(type.setup())
+    initProps(instance)
 
-    instance.setupState = setupResult
+    const setupContext = createSetupContext(instance)
+
+    if (isFunction(type.setup)) {
+        const setupResult = proxyRefs(type.setup(instance.props, setupContext))
+
+        instance.setupState = setupResult
+    }
+
     instance.render = type.render
+}
 
+/**
+ * 创建setup上下文
+ * @param instance 
+ * @returns 
+ */
+function createSetupContext(instance) {
+    return {
+        get attrs() {
+            return instance.attrs
+        },
+    }
 }
