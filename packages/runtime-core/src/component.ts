@@ -39,6 +39,7 @@ export const setupComponent = (instance) => {
 }
 
 const publicPropertiesMap = {
+    $el: (i) => i.vnode.el,
     $attrs: (i) => i.attrs,
     $slots: (i) => i.slots,
     $refs: (i) => i.refs,
