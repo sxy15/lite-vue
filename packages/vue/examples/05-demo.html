@@ -12,17 +12,26 @@
     <script type="module">
         // import { render, h, Text, createRenderer } from '../../../node_modules/vue/dist/vue.esm-browser.js'
 
-        import { render, Text, h } from '../dist/vue.esm.js'
+        import { render, Text, h, createApp } from '../dist/vue.esm.js'
 
         const vnode = h('div', null, ['hello', 'world'])
         const vnode2 = h('div', null, ['world', 'hello'])
         // const vnode2 = h(Text, 'hello vue')
-        console.log(vnode)
-        render(vnode, app)
+        // console.log(vnode)
+        // render(vnode, app)
 
-        setTimeout(() => {
-            render(vnode2, app)
-        }, 1000)
+        // setTimeout(() => {
+        //     render(vnode2, app)
+        // }, 1000)
+
+        const Comp = {
+            render() {
+                return h('div', 'hello vue')
+            }
+        }
+        const vm = createApp(Comp, { msg: 'hello' })
+        console.log(vm)
+        vm.mount(app)
     </script>
 </body>
 

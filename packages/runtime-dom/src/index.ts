@@ -13,3 +13,8 @@ const renderer = createRenderer(renderOptions)
 export function render(vnode, container) {
     renderer.render(vnode, container)
 }
+
+export function createApp(rootComponent, rootProps) {
+    const app = renderer.createApp(rootComponent, rootProps)
+    return app
+}

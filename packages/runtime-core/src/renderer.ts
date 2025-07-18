@@ -1,5 +1,6 @@
 import { ShapeFlags } from "@vue/shared"
 import { isSameVNodeType, normalizeVNode, Text } from "./vnode"
+import { createAppAPI } from "./apiCreateApp"
 
 export function createRenderer(options) {
     /**
@@ -408,9 +409,7 @@ export function createRenderer(options) {
 
     return {
         render,
-        createApp(rootComponent) {
-            return {}
-        }
+        createApp: createAppAPI(render)
     }
 }
 
