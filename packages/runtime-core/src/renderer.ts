@@ -2,6 +2,7 @@ import { ShapeFlags } from "@vue/shared"
 import { isSameVNodeType, normalizeVNode, Text } from "./vnode"
 import { createAppAPI } from "./apiCreateApp"
 import { createComponentInstance, setupComponent } from "./component"
+import { ReactiveEffect } from "@vue/reactivity"
 
 export function createRenderer(options) {
     /**
@@ -58,9 +59,24 @@ export function createRenderer(options) {
         const instance = createComponentInstance(vnode)
         // 2.初始化组件状态
         setupComponent(instance)
-        // 3.挂载到页面
-        const subTree = instance.render.call(instance.setupState)
-        patch(null, subTree, container, anchor)
+
+        const componentUpdateFn = () => {
+            // 3.区分挂载和更新
+            if (!instance.isMounted) {
+                const subTree = instance.render.call(instance.setupState)
+                patch(null, subTree, container, anchor)
+                instance.isMounted = true
+                instance.subTree = subTree
+            } else {
+                const subTree = instance.render.call(instance.setupState)
+                patch(instance.subTree, subTree, container, anchor)
+                instance.subTree = subTree
+            }
+        }
+
+        // 创建effect
+        const effect = new ReactiveEffect(componentUpdateFn)
+        effect.run()
     }
 
     /**

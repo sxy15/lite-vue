@@ -9,6 +9,7 @@
 
 <body>
     <div id="app"></div>
+    <button id="btn">按钮</button>
     <script type="module">
         // import { render, h, Text, createRenderer } from '../../../node_modules/vue/dist/vue.esm-browser.js'
 
@@ -27,6 +28,11 @@
         const Comp = {
             setup() {
                 const count = ref(0)
+
+                btn.onclick = () => {
+                    console.log(count.value)
+                    count.value++
+                }
 
                 return {
                     count
